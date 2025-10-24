@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Flerr Brand Colors */
+    --accent-red: 165 12 10; /* #A50C0A */
+    --warm-brown: 156 119 80; /* #9C7750 */
+    --sand: 229 205 159; /* #E5CD9F */
+    --light-cream: 248 234 200; /* #F8EAC8 */
+    --deep-green: 51 58 26; /* #333A1A */
+
+    /* Theme Variables */
+    --background: 39 32 16; /* F8EAC8 in HSL */
+    --foreground: var(--deep-green);
+
+    --card: 0 0 100%;
+    --card-foreground: var(--deep-green);
+
+    --popover: 0 0 100%;
+    --popover-foreground: var(--deep-green);
+
+    --primary: var(--accent-red);
+    --primary-foreground: 0 0 100%;
+
+    --secondary: var(--warm-brown);
+    --secondary-foreground: 0 0 100%;
+
+    --accent: var(--sand);
+    --accent-foreground: var(--deep-green);
+
+    --muted: var(--sand);
+    --muted-foreground: var(--warm-brown);
+
+    --destructive: var(--accent-red);
+    --destructive-foreground: 0 0 100%;
+
+    --border: var(--sand);
+    --input: var(--sand);
+    --ring: var(--accent-red);
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-[#F8EAC8] text-[#333A1A] antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.7;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    line-height: 1.3;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-sm;
+  }
+
+  .paper-texture {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  .gradient-cream {
+    background: linear-gradient(135deg, #f8eac8 0%, #e5cd9f 100%);
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-[#E5CD9F]/30 rounded-lg;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-[#9C7750]/50 rounded-lg hover:bg-[#9C7750]/70;
+  }
+
+  /* Animation utilities */
+  .animate-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animate-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
+}
+
+/* Loading skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #e5cd9f 4%, #f8eac8 25%, #e5cd9f 36%);
+  background-size: 1000px 100%;
+}
+
