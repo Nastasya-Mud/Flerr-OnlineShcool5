@@ -1,4 +1,4 @@
-import { User, BookOpen, Heart, Award } from 'lucide-react';
+import { BookOpen, Heart, Award } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/lib/store';

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactPlayer from 'react-player';
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { cn, formatDuration } from '@/lib/utils';
 import { lessonsAPI } from '@/lib/api';
 
@@ -52,11 +52,11 @@ export function VideoPlayer({ url, lessonId, chapters = [], onProgressSave }: Vi
   };
 
   const toggleFullscreen = () => {
-    const elem = playerRef.current?.wrapper;
-    if (!elem) return;
+    const playerWrapper = (playerRef.current as any)?.wrapper;
+    if (!playerWrapper) return;
 
     if (!document.fullscreenElement) {
-      elem.requestFullscreen?.();
+      playerWrapper.requestFullscreen?.();
     } else {
       document.exitFullscreen?.();
     }
