@@ -176,7 +176,7 @@ export const toggleFavorite = async (req: AuthRequest, res: Response) => {
     if (favoriteIndex > -1) {
       user.favorites.splice(favoriteIndex, 1);
     } else {
-      user.favorites.push(course._id);
+      user.favorites.push(course._id as any);
     }
 
     await user.save();

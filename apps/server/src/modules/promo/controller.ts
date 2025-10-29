@@ -28,7 +28,7 @@ export const validatePromoCode = async (req: AuthRequest, res: Response) => {
     // Проверяем, не активирован ли уже этим пользователем
     const user = await User.findById(req.user!.id);
     const alreadyActivated = user?.activatedPromoCodes.some(
-      (activation) => activation.codeId.toString() === promoCode._id.toString()
+      (activation) => activation.codeId.toString() === String(promoCode._id)
     );
 
     if (alreadyActivated) {
@@ -80,7 +80,7 @@ export const activatePromoCode = async (req: AuthRequest, res: Response) => {
 
     // Проверяем, не активирован ли уже
     const alreadyActivated = user.activatedPromoCodes.some(
-      (activation) => activation.codeId.toString() === promoCode._id.toString()
+      (activation) => activation.codeId.toString() === String(promoCode._id)
     );
 
     if (alreadyActivated) {

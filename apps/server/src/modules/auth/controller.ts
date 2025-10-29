@@ -24,11 +24,11 @@ export const register = async (req: Request, res: Response) => {
 
     // Генерируем токены
     const accessToken = generateAccessToken({
-      id: user._id.toString(),
+      id: String(user._id),
       email: user.email,
       roles: user.roles,
     });
-    const refreshToken = generateRefreshToken({ id: user._id.toString() });
+    const refreshToken = generateRefreshToken({ id: String(user._id) });
 
     // Отправляем welcome email
     sendWelcomeEmail(user.email, user.name).catch(console.error);
@@ -73,11 +73,11 @@ export const login = async (req: Request, res: Response) => {
 
     // Генерируем токены
     const accessToken = generateAccessToken({
-      id: user._id.toString(),
+      id: String(user._id),
       email: user.email,
       roles: user.roles,
     });
-    const refreshToken = generateRefreshToken({ id: user._id.toString() });
+    const refreshToken = generateRefreshToken({ id: String(user._id) });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -117,7 +117,7 @@ export const refresh = async (req: Request, res: Response) => {
     }
 
     const accessToken = generateAccessToken({
-      id: user._id.toString(),
+      id: String(user._id),
       email: user.email,
       roles: user.roles,
     });

@@ -144,7 +144,7 @@ const seedData = async () => {
     });
 
     // Обновляем курс со ссылками на уроки
-    course1.lessons = [lesson1_1._id, lesson1_2._id, lesson1_3._id];
+    course1.lessons = [lesson1_1._id as any, lesson1_2._id as any, lesson1_3._id as any];
     await course1.save();
 
     console.log('📖 Creating lessons for Course 2...');
@@ -179,7 +179,7 @@ const seedData = async () => {
       ],
     });
 
-    course2.lessons = [lesson2_1._id, lesson2_2._id];
+    course2.lessons = [lesson2_1._id as any, lesson2_2._id as any];
     await course2.save();
 
     console.log('🎫 Creating promo codes...');
