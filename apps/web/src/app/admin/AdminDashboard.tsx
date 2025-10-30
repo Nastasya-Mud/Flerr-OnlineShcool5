@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Ticket, Users, Settings, X } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Ticket, Users, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -156,7 +156,7 @@ function CourseDialog({ course, onClose, onSave }: { course: any; onClose: () =>
     e.preventDefault();
     const data = {
       ...formData,
-      categories: formData.categories.split(',').map((c) => c.trim()).filter(Boolean),
+      categories: formData.categories.split(',').map((c: string) => c.trim()).filter(Boolean),
     };
     onSave(data);
   };
