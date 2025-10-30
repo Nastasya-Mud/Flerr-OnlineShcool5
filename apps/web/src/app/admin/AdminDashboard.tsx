@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Ticket, Users, Settings } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Ticket, Users, Settings, GraduationCap, ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { adminAPI, coursesAPI, promoAPI } from '@/lib/api';
+import { adminAPI, coursesAPI, promoAPI, teachersAPI, galleryAPI } from '@/lib/api';
 import { LEVELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
@@ -767,14 +767,447 @@ function AdminUsers() {
   );
 }
 
+function TeacherDialog({ teacher, onClose, onSave }: { teacher: any; onClose: () => void; onSave: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    name: teacher?.name || '',
+    photo: teacher?.photo || '',
+    specialization: teacher?.specialization || '',
+    bio: teacher?.bio || '',
+    experience: teacher?.experience || '',
+    order: teacher?.order || 0,
+    active: teacher?.active !== false,
+    social: {
+      instagram: teacher?.social?.instagram || '',
+      website: teacher?.social?.website || '',
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{teacher ? 'Редактировать преподавателя' : 'Добавить преподавателя'}</DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="name">Имя *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="specialization">Специализация *</Label>
+              <Input
+                id="specialization"
+                value={formData.specialization}
+                onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="photo">URL фото *</Label>
+            <Input
+              id="photo"
+              value={formData.photo}
+              onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
+              placeholder="https://images.unsplash.com/..."
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="experience">Опыт работы *</Label>
+            <Input
+              id="experience"
+              value={formData.experience}
+              onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+              placeholder="10+ лет в флористике"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="bio">Биография *</Label>
+            <textarea
+              id="bio"
+              value={formData.bio}
+              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+              className="w-full min-h-[100px] px-3 py-2 border rounded-md"
+              required
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="instagram">Instagram</Label>
+              <Input
+                id="instagram"
+                value={formData.social.instagram}
+                onChange={(e) => setFormData({ ...formData, social: { ...formData.social, instagram: e.target.value } })}
+                placeholder="https://instagram.com/..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="website">Веб-сайт</Label>
+              <Input
+                id="website"
+                value={formData.social.website}
+                onChange={(e) => setFormData({ ...formData, social: { ...formData.social, website: e.target.value } })}
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="order">Порядок отображения</Label>
+              <Input
+                id="order"
+                type="number"
+                value={formData.order}
+                onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              />
+            </div>
+            <div className="flex items-center gap-2 pt-7">
+              <input
+                type="checkbox"
+                id="active"
+                checked={formData.active}
+                onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <Label htmlFor="active">Активен</Label>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button type="submit" className="bg-[#A50C0A]">
+              {teacher ? 'Сохранить' : 'Добавить'}
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Отмена
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AdminTeachers() {
+  const [teachers, setTeachers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingTeacher, setEditingTeacher] = useState<any>(null);
+  const [showDialog, setShowDialog] = useState(false);
+
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
+
+  const fetchTeachers = async () => {
+    try {
+      const response = await teachersAPI.getAll();
+      setTeachers(response.data.teachers || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Удалить преподавателя?')) return;
+    try {
+      await teachersAPI.delete(id);
+      setTeachers(teachers.filter((t) => t._id !== id));
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при удалении');
+    }
+  };
+
+  const handleSave = async (data: any) => {
+    try {
+      if (editingTeacher) {
+        await teachersAPI.update(editingTeacher._id, data);
+      } else {
+        await teachersAPI.create(data);
+      }
+      setShowDialog(false);
+      fetchTeachers();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при сохранении');
+    }
+  };
+
+  if (loading) return <Skeleton className="h-64" />;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-3xl font-bold text-[#333A1A]">Преподаватели</h2>
+        <Button onClick={() => { setEditingTeacher(null); setShowDialog(true); }} className="bg-[#A50C0A]">
+          + Добавить преподавателя
+        </Button>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {teachers.map((teacher) => (
+          <Card key={teacher._id}>
+            <CardContent className="p-4">
+              <div className="flex gap-4">
+                <img src={teacher.photo} alt={teacher.name} className="w-24 h-24 object-cover rounded-lg" />
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-1">
+                    <div>
+                      <h3 className="font-bold text-[#333A1A]">{teacher.name}</h3>
+                      <p className="text-sm text-[#A50C0A]">{teacher.specialization}</p>
+                      <p className="text-sm text-[#9C7750]">{teacher.experience}</p>
+                    </div>
+                    {teacher.active ? (
+                      <Badge variant="default">Активен</Badge>
+                    ) : (
+                      <Badge variant="outline">Скрыт</Badge>
+                    )}
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <Button size="sm" variant="outline" onClick={() => { setEditingTeacher(teacher); setShowDialog(true); }}>
+                      ✏️
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleDelete(teacher._id)} className="text-red-600">
+                      🗑️
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {showDialog && <TeacherDialog teacher={editingTeacher} onClose={() => setShowDialog(false)} onSave={handleSave} />}
+    </div>
+  );
+}
+
+function GalleryDialog({ item, onClose, onSave }: { item: any; onClose: () => void; onSave: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    title: item?.title || '',
+    imageUrl: item?.imageUrl || '',
+    category: item?.category || 'букеты',
+    description: item?.description || '',
+    order: item?.order || 0,
+    featured: item?.featured || false,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{item ? 'Редактировать' : 'Добавить фото'}</DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div>
+            <Label htmlFor="title">Название *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="imageUrl">URL изображения *</Label>
+            <Input
+              id="imageUrl"
+              value={formData.imageUrl}
+              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              placeholder="https://images.unsplash.com/..."
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="category">Категория *</Label>
+            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="букеты">Букеты</SelectItem>
+                <SelectItem value="свадьбы">Свадьбы</SelectItem>
+                <SelectItem value="композиции">Композиции</SelectItem>
+                <SelectItem value="сезонные">Сезонные</SelectItem>
+                <SelectItem value="корпоративные">Корпоративные</SelectItem>
+                <SelectItem value="другое">Другое</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="description">Описание</Label>
+            <textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full min-h-[60px] px-3 py-2 border rounded-md"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="order">Порядок</Label>
+              <Input
+                id="order"
+                type="number"
+                value={formData.order}
+                onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              />
+            </div>
+            <div className="flex items-center gap-2 pt-7">
+              <input
+                type="checkbox"
+                id="featured"
+                checked={formData.featured}
+                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <Label htmlFor="featured">Избранное</Label>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button type="submit" className="bg-[#A50C0A]">
+              {item ? 'Сохранить' : 'Добавить'}
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Отмена
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AdminGallery() {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [showDialog, setShowDialog] = useState(false);
+
+  useEffect(() => {
+    fetchGallery();
+  }, []);
+
+  const fetchGallery = async () => {
+    try {
+      const response = await galleryAPI.getAll();
+      setItems(response.data.items || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Удалить фото?')) return;
+    try {
+      await galleryAPI.delete(id);
+      setItems(items.filter((i) => i._id !== id));
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при удалении');
+    }
+  };
+
+  const handleSave = async (data: any) => {
+    try {
+      if (editingItem) {
+        await galleryAPI.update(editingItem._id, data);
+      } else {
+        await galleryAPI.create(data);
+      }
+      setShowDialog(false);
+      fetchGallery();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ошибка при сохранении');
+    }
+  };
+
+  if (loading) return <Skeleton className="h-64" />;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-3xl font-bold text-[#333A1A]">Галерея работ</h2>
+        <Button onClick={() => { setEditingItem(null); setShowDialog(true); }} className="bg-[#A50C0A]">
+          + Добавить фото
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {items.map((item) => (
+          <Card key={item._id} className="overflow-hidden">
+            <div className="aspect-square relative group">
+              <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+              <div className="absolute top-2 right-2 flex gap-1">
+                {item.featured && <Badge className="bg-[#A50C0A]">⭐</Badge>}
+              </div>
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <Button size="sm" variant="outline" className="bg-white" onClick={() => { setEditingItem(item); setShowDialog(true); }}>
+                  ✏️
+                </Button>
+                <Button size="sm" variant="outline" className="bg-white text-red-600" onClick={() => handleDelete(item._id)}>
+                  🗑️
+                </Button>
+              </div>
+            </div>
+            <CardContent className="p-3">
+              <h3 className="font-bold text-sm text-[#333A1A] truncate">{item.title}</h3>
+              <Badge variant="outline" className="text-xs mt-1">{item.category}</Badge>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {showDialog && <GalleryDialog item={editingItem} onClose={() => setShowDialog(false)} onSave={handleSave} />}
+    </div>
+  );
+}
+
 export function AdminDashboard() {
   const location = useLocation();
 
   const navItems = [
-    { href: '/admin', label: 'Панель', icon: LayoutDashboard },
-    { href: '/admin/courses', label: 'Курсы', icon: BookOpen },
-    { href: '/admin/promo', label: 'Промокоды', icon: Ticket },
-    { href: '/admin/users', label: 'Пользователи', icon: Users },
+    { href: '/admin', label: 'Панель', icon: LayoutDashboard, path: '' },
+    { href: '/admin/courses', label: 'Курсы', icon: BookOpen, path: 'courses' },
+    { href: '/admin/teachers', label: 'Преподаватели', icon: GraduationCap, path: 'teachers' },
+    { href: '/admin/gallery', label: 'Галерея', icon: ImageIcon, path: 'gallery' },
+    { href: '/admin/promo', label: 'Промокоды', icon: Ticket, path: 'promo' },
+    { href: '/admin/users', label: 'Пользователи', icon: Users, path: 'users' },
   ];
 
   return (
@@ -816,10 +1249,12 @@ export function AdminDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <Routes>
-              <Route path="/" element={<AdminHome />} />
-              <Route path="/courses" element={<AdminCourses />} />
-              <Route path="/promo" element={<AdminPromoCodes />} />
-              <Route path="/users" element={<AdminUsers />} />
+              <Route index element={<AdminHome />} />
+              <Route path="courses" element={<AdminCourses />} />
+              <Route path="teachers" element={<AdminTeachers />} />
+              <Route path="gallery" element={<AdminGallery />} />
+              <Route path="promo" element={<AdminPromoCodes />} />
+              <Route path="users" element={<AdminUsers />} />
             </Routes>
           </div>
         </div>

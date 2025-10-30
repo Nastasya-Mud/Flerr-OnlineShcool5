@@ -112,3 +112,21 @@ export const uploadsAPI = {
   getUploadUrl: (data: any) => api.post('/uploads/s3-sign', data),
 };
 
+// Teachers API
+export const teachersAPI = {
+  getAll: (params?: any) => api.get('/teachers', { params }),
+  getById: (id: string) => api.get(`/teachers/${id}`),
+  create: (data: any) => api.post('/teachers', data),
+  update: (id: string, data: any) => api.patch(`/teachers/${id}`, data),
+  delete: (id: string) => api.delete(`/teachers/${id}`),
+};
+
+// Gallery API
+export const galleryAPI = {
+  getAll: (params?: any) => api.get('/gallery', { params }),
+  getById: (id: string) => api.get(`/gallery/${id}`),
+  create: (data: any) => api.post('/gallery', data),
+  update: (id: string, data: any) => api.patch(`/gallery/${id}`, data),
+  delete: (id: string) => api.delete(`/gallery/${id}`),
+};
+

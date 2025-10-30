@@ -3,6 +3,8 @@ import { ArrowRight, BookOpen, Users, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/domain/CourseCard';
+import { TeachersSection } from '@/components/domain/TeachersSection';
+import { GallerySection } from '@/components/domain/GallerySection';
 import { useCourses } from '@/lib/hooks/useCourses';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -141,6 +143,12 @@ export function HomePage() {
           )}
         </div>
       </section>
+
+      {/* Teachers Section */}
+      <TeachersSection />
+
+      {/* Gallery Section */}
+      <GallerySection />
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-[#A50C0A] to-[#9C7750] text-white">

@@ -14,6 +14,8 @@ import promoRoutes from './modules/promo/routes.js';
 import searchRoutes from './modules/search/routes.js';
 import uploadsRoutes from './modules/uploads/routes.js';
 import adminRoutes from './modules/admin/routes.js';
+import teachersRoutes from './modules/teachers/routes.js';
+import galleryRoutes from './modules/gallery/routes.js';
 
 dotenv.config();
 
@@ -45,6 +47,8 @@ app.use('/api/promo', promoRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/uploads', uploadsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/teachers', teachersRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // 404 handler
 app.use((req, res) => {
