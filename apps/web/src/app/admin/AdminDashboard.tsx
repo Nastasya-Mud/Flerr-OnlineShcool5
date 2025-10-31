@@ -1226,7 +1226,10 @@ export function AdminDashboard() {
               <CardContent>
                 <nav className="space-y-2">
                   {navItems.map((item) => {
-                    const isActive = location.pathname === item.href;
+                    const isActive = 
+                      item.href === '/admin' 
+                        ? location.pathname === '/admin'
+                        : location.pathname.startsWith(item.href);
                     const Icon = item.icon;
 
                     return (
