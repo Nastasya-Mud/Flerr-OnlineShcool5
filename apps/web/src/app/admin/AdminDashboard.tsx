@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { adminAPI, coursesAPI, promoAPI, teachersAPI, galleryAPI } from '@/lib/api';
 import { LEVELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -271,12 +272,19 @@ function CourseDialog({ course, onClose, onSave }: { course: any; onClose: () =>
           </div>
 
           <div>
-            <Label htmlFor="coverUrl">URL обложки</Label>
+            <Label htmlFor="coverUrl">Обложка курса</Label>
+            <ImageUpload
+              value={formData.coverUrl}
+              onChange={(url) => handleChange('coverUrl', url)}
+              label="Загрузить обложку"
+            />
+            <p className="text-xs text-[#9C7750] mt-1">Или вставьте URL:</p>
             <Input
               id="coverUrl"
               value={formData.coverUrl}
               onChange={(e) => handleChange('coverUrl', e.target.value)}
               placeholder="https://images.unsplash.com/..."
+              className="mt-1"
             />
           </div>
 
@@ -817,13 +825,20 @@ function TeacherDialog({ teacher, onClose, onSave }: { teacher: any; onClose: ()
           </div>
 
           <div>
-            <Label htmlFor="photo">URL фото *</Label>
+            <Label htmlFor="photo">Фото преподавателя *</Label>
+            <ImageUpload
+              value={formData.photo}
+              onChange={(url) => setFormData({ ...formData, photo: url })}
+              label="Загрузить фото"
+            />
+            <p className="text-xs text-[#9C7750] mt-1">Или вставьте URL:</p>
             <Input
               id="photo"
               value={formData.photo}
               onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
               placeholder="https://images.unsplash.com/..."
               required
+              className="mt-1"
             />
           </div>
 
@@ -1037,13 +1052,20 @@ function GalleryDialog({ item, onClose, onSave }: { item: any; onClose: () => vo
           </div>
 
           <div>
-            <Label htmlFor="imageUrl">URL изображения *</Label>
+            <Label htmlFor="imageUrl">Изображение *</Label>
+            <ImageUpload
+              value={formData.imageUrl}
+              onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+              label="Загрузить фото"
+            />
+            <p className="text-xs text-[#9C7750] mt-1">Или вставьте URL:</p>
             <Input
               id="imageUrl"
               value={formData.imageUrl}
               onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
               placeholder="https://images.unsplash.com/..."
               required
+              className="mt-1"
             />
           </div>
 
