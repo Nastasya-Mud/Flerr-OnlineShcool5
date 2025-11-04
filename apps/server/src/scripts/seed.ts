@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { connectDB } from '../db/connect.js';
-import { User, Course, Lesson, PromoCode } from '../db/models/index.js';
+import { User, Course, Lesson, PromoCode, Teacher, Gallery } from '../db/models/index.js';
 
 dotenv.config();
 
@@ -14,6 +14,8 @@ const seedData = async () => {
       Course.deleteMany({}),
       Lesson.deleteMany({}),
       PromoCode.deleteMany({}),
+      Teacher.deleteMany({}),
+      Gallery.deleteMany({}),
     ]);
 
     console.log('👤 Creating users...');
@@ -230,12 +232,134 @@ const seedData = async () => {
       notes: 'Тестовый истекший промокод',
     });
 
+    console.log('👨‍🏫 Creating teachers...');
+    
+    const teacher1 = await Teacher.create({
+      name: 'Мария Петрова',
+      photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800',
+      specialization: 'Основы флористики и композиции',
+      bio: 'Профессиональный флорист с 15-летним опытом. Член Российской гильдии флористов. Преподаю искусство создания букетов и композиций, работаю с различными стилями и техниками.',
+      experience: '15+ лет в профессиональной флористике',
+      courses: [course1._id],
+      order: 1,
+      active: true,
+      social: {
+        instagram: 'https://instagram.com/maria_flowers',
+        website: 'https://maria-floristry.com',
+      },
+    });
+
+    const teacher2 = await Teacher.create({
+      name: 'Елена Соколова',
+      photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800',
+      specialization: 'Свадебная флористика',
+      bio: 'Специалист по свадебной флористике, создатель уникальных букетов и декора для самого важного дня. Работала на более чем 200 свадебных церемониях, включая celebrity-мероприятия.',
+      experience: '10+ лет в свадебной флористике',
+      courses: [course2._id],
+      order: 2,
+      active: true,
+      social: {
+        instagram: 'https://instagram.com/elena_wedding_flowers',
+      },
+    });
+
+    const teacher3 = await Teacher.create({
+      name: 'Ольга Васильева',
+      photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800',
+      specialization: 'Сезонные композиции и декор',
+      bio: 'Эксперт по работе с сезонными цветами и природными материалами. Создаю уникальные композиции для каждого времени года, использую нетрадиционные элементы декора.',
+      experience: '12+ лет флористического дизайна',
+      courses: [course3._id],
+      order: 3,
+      active: true,
+      social: {
+        instagram: 'https://instagram.com/olga_seasonal_art',
+        website: 'https://olga-flowers.ru',
+      },
+    });
+
+    console.log('🖼️  Creating gallery items...');
+
+    await Gallery.create({
+      title: 'Пионовый букет',
+      imageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800',
+      category: 'букеты',
+      description: 'Нежный букет из розовых пионов и эвкалипта',
+      order: 1,
+      featured: true,
+    });
+
+    await Gallery.create({
+      title: 'Свадебная композиция',
+      imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+      category: 'свадьбы',
+      description: 'Элегантная композиция для свадебного стола',
+      order: 2,
+      featured: true,
+    });
+
+    await Gallery.create({
+      title: 'Осенний декор',
+      imageUrl: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800',
+      category: 'сезонные',
+      description: 'Композиция в осенних тонах с сухоцветами',
+      order: 3,
+      featured: true,
+    });
+
+    await Gallery.create({
+      title: 'Розовый букет невесты',
+      imageUrl: 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800',
+      category: 'свадьбы',
+      description: 'Романтичный букет из пионовидных роз',
+      order: 4,
+      featured: true,
+    });
+
+    await Gallery.create({
+      title: 'Весенние тюльпаны',
+      imageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800',
+      category: 'букеты',
+      description: 'Яркий букет из разноцветных тюльпанов',
+      order: 5,
+      featured: true,
+    });
+
+    await Gallery.create({
+      title: 'Корпоративная композиция',
+      imageUrl: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=800',
+      category: 'корпоративные',
+      description: 'Элегантная настольная композиция для офиса',
+      order: 6,
+      featured: true,
+    });
+
+    await Gallery.create({
+      title: 'Зимняя сказка',
+      imageUrl: 'https://images.unsplash.com/photo-1512034144-19b3d1b6e3d6?w=800',
+      category: 'сезонные',
+      description: 'Новогодняя композиция с хвоей и шишками',
+      order: 7,
+      featured: false,
+    });
+
+    await Gallery.create({
+      title: 'Летний микс',
+      imageUrl: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800',
+      category: 'композиции',
+      description: 'Яркая летняя композиция из полевых цветов',
+      order: 8,
+      featured: false,
+    });
+
     console.log('✅ Seed completed successfully!');
     console.log('\n📊 Created:');
     console.log(`   - 2 users (admin@flerr.ru / student@flerr.ru)`);
     console.log(`   - 3 courses`);
     console.log(`   - 5 lessons`);
     console.log(`   - 4 promo codes`);
+    console.log(`   - 3 teachers`);
+    console.log(`   - 8 gallery items`);
     console.log('\n🔑 Test credentials:');
     console.log('   Admin: admin@flerr.ru / admin123');
     console.log('   Student: student@flerr.ru / student123');
