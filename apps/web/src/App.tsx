@@ -10,6 +10,7 @@ import { CoursePage } from './app/CoursePage';
 import { LessonPage } from './app/LessonPage';
 import { SearchPage } from './app/SearchPage';
 import { ProfilePage } from './app/ProfilePage';
+import { GalleryPage } from './app/GalleryPage';
 import { LoginPage } from './app/auth/LoginPage';
 import { RegisterPage } from './app/auth/RegisterPage';
 import { ForgotPasswordPage } from './app/auth/ForgotPasswordPage';
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:slug" element={<CoursePage />} />
+                <Route path="/gallery" element={<GalleryPage />} />
                 <Route
                   path="/lessons/:id"
                   element={

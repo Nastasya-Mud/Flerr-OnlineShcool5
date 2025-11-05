@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, BookOpen, Users, Trophy } from 'lucide-react';
+import { ArrowRight, BookOpen, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/domain/CourseCard';
@@ -71,27 +71,37 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Reviews Section */}
       <section className="py-16 bg-white/50">
         <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold text-[#333A1A] mb-4">Отзывы учеников</h2>
+            <p className="text-lg text-[#9C7750]">Что говорят наши студенты о курсах</p>
+          </motion.div>
+
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: BookOpen,
-                title: 'Профессиональные курсы',
-                description: 'Структурированные программы обучения от базовых до продвинутых',
+                name: 'Анна Ковалева',
+                text: 'Прошла курс "Основы флористики" и осталась в полном восторге! Мария Петрова — потрясающий преподаватель, объясняет все доступно и подробно. Теперь создаю букеты для друзей!',
+                rating: 5,
               },
               {
-                icon: Users,
-                title: 'Опытные преподаватели',
-                description: 'Учитесь у практикующих флористов с многолетним опытом',
+                name: 'Елена Смирнова',
+                text: 'Курс по свадебной флористике превзошел все ожидания! Научилась создавать профессиональные композиции. Уже получила первые заказы на свадьбы. Спасибо!',
+                rating: 5,
               },
               {
-                icon: Trophy,
-                title: 'Практические навыки',
-                description: 'Создавайте реальные композиции и получайте обратную связь',
+                name: 'Ольга Новикова',
+                text: 'Отличная школа! Видеоуроки очень качественные, все понятно показано. Особенно понравился раздел с сезонными композициями. Рекомендую всем!',
+                rating: 5,
               },
-            ].map((feature, index) => (
+            ].map((review, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -100,11 +110,21 @@ export function HomePage() {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow"
               >
-                <div className="w-14 h-14 bg-[#A50C0A]/10 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-7 h-7 text-[#A50C0A]" />
+                <div className="flex mb-3">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <span key={i} className="text-[#FFB800] text-xl">★</span>
+                  ))}
                 </div>
-                <h3 className="text-xl font-semibold text-[#333A1A] mb-3">{feature.title}</h3>
-                <p className="text-[#9C7750]">{feature.description}</p>
+                <p className="text-[#333A1A] mb-4 italic">"{review.text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#A50C0A]/10 rounded-full flex items-center justify-center">
+                    <Users className="w-6 h-6 text-[#A50C0A]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#333A1A]">{review.name}</p>
+                    <p className="text-sm text-[#9C7750]">Студентка Flerr</p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>

@@ -281,75 +281,75 @@ const seedData = async () => {
     console.log('🖼️  Creating gallery items...');
 
     await Gallery.create({
-      title: 'Пионовый букет',
-      imageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800',
-      category: 'букеты',
-      description: 'Нежный букет из розовых пионов и эвкалипта',
+      title: 'Пудровый букет невесты',
+      imageUrl: 'https://images.unsplash.com/photo-1535515602456-c0d52a1a0380?w=800',
+      category: 'свадьбы',
+      description: 'Нежный свадебный букет в пудровых тонах с розами и эвкалиптом',
       order: 1,
       featured: true,
     });
 
     await Gallery.create({
-      title: 'Свадебная композиция',
-      imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
-      category: 'свадьбы',
-      description: 'Элегантная композиция для свадебного стола',
+      title: 'Букет с протеей',
+      imageUrl: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=800',
+      category: 'букеты',
+      description: 'Оригинальный букет с экзотической протеей и розами',
       order: 2,
       featured: true,
     });
 
     await Gallery.create({
-      title: 'Осенний декор',
-      imageUrl: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800',
-      category: 'сезонные',
-      description: 'Композиция в осенних тонах с сухоцветами',
+      title: 'Настольная композиция',
+      imageUrl: 'https://images.unsplash.com/photo-1558818498-28c1e002b655?w=800',
+      category: 'композиции',
+      description: 'Элегантная композиция для праздничного стола',
       order: 3,
       featured: true,
     });
 
     await Gallery.create({
-      title: 'Розовый букет невесты',
-      imageUrl: 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800',
-      category: 'свадьбы',
-      description: 'Романтичный букет из пионовидных роз',
+      title: 'Монохромный букет',
+      imageUrl: 'https://images.unsplash.com/photo-1606506120924-0ccf8a16e60c?w=800',
+      category: 'букеты',
+      description: 'Стильный монохромный букет из белых и кремовых цветов',
       order: 4,
       featured: true,
     });
 
     await Gallery.create({
-      title: 'Весенние тюльпаны',
-      imageUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800',
-      category: 'букеты',
-      description: 'Яркий букет из разноцветных тюльпанов',
+      title: 'Романтическая композиция',
+      imageUrl: 'https://images.unsplash.com/photo-1594310913870-b0c527c4b7d0?w=800',
+      category: 'композиции',
+      description: 'Романтичная композиция в розовых тонах для особого случая',
       order: 5,
       featured: true,
     });
 
     await Gallery.create({
-      title: 'Корпоративная композиция',
-      imageUrl: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=800',
+      title: 'Корпоративный букет',
+      imageUrl: 'https://images.unsplash.com/photo-1591886960571-74d43a9d4166?w=800',
       category: 'корпоративные',
-      description: 'Элегантная настольная композиция для офиса',
+      description: 'Стильный букет для корпоративного подарка',
       order: 6,
       featured: true,
     });
 
     await Gallery.create({
-      title: 'Зимняя сказка',
-      imageUrl: 'https://images.unsplash.com/photo-1512034144-19b3d1b6e3d6?w=800',
-      category: 'сезонные',
-      description: 'Новогодняя композиция с хвоей и шишками',
+      title: 'Букет в шляпной коробке',
+      imageUrl: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=800',
+      category: 'букеты',
+      description: 'Роскошный букет в элегантной шляпной коробке',
       order: 7,
-      featured: false,
+      featured: true,
     });
 
     await Gallery.create({
-      title: 'Летний микс',
-      imageUrl: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800',
-      category: 'композиции',
-      description: 'Яркая летняя композиция из полевых цветов',
+      title: 'Пионовая мечта',
+      imageUrl: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=800',
+      category: 'свадьбы',
+      description: 'Воздушный свадебный букет из пионов',
       order: 8,
-      featured: false,
+      featured: true,
     });
 
     console.log('✅ Seed completed successfully!');

@@ -25,6 +25,7 @@ export function AppShell({ children }: AppShellProps) {
   const navLinks = [
     { href: '/', label: 'Главная' },
     { href: '/courses', label: 'Курсы' },
+    { href: '/gallery', label: 'Работы учеников' },
     { href: '/search', label: 'Поиск' },
   ];
 
