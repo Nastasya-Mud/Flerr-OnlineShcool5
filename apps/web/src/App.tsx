@@ -36,50 +36,49 @@ function App() {
   return (
     <>
       <Routes>
+        {/* Auth routes - without AppShell */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
+        {/* Main routes - with AppShell */}
+        <Route path="/" element={<AppShell><HomePage /></AppShell>} />
+        <Route path="/courses" element={<AppShell><CoursesPage /></AppShell>} />
+        <Route path="/courses/:slug" element={<AppShell><CoursePage /></AppShell>} />
+        <Route path="/gallery" element={<AppShell><GalleryPage /></AppShell>} />
+        <Route path="/search" element={<AppShell><SearchPage /></AppShell>} />
+        
+        {/* Protected routes */}
         <Route
-          path="/*"
+          path="/lessons/:id"
           element={
-            <AppShell>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/courses" element={<CoursesPage />} />
-                <Route path="/courses/:slug" element={<CoursePage />} />
-                <Route path="/gallery" element={<GalleryPage />} />
-                <Route
-                  path="/lessons/:id"
-                  element={
-                    <ProtectedRoute>
-                      <LessonPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/search" element={<SearchPage />} />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/*"
-                  element={
-                    <AdminRoute>
-                      <AdminDashboard />
-                    </AdminRoute>
-                  }
-                />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </AppShell>
+            <ProtectedRoute>
+              <AppShell><LessonPage /></AppShell>
+            </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <AppShell><ProfilePage /></AppShell>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin routes */}
+        <Route
+          path="/admin/*"
+          element={
+            <AdminRoute>
+              <AppShell><AdminDashboard /></AppShell>
+            </AdminRoute>
+          }
+        />
+
+        {/* 404 */}
+        <Route path="*" element={<AppShell><NotFoundPage /></AppShell>} />
       </Routes>
       <Toaster />
     </>
