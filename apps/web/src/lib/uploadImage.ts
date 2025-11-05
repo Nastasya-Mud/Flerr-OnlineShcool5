@@ -1,28 +1,44 @@
 // Бесплатный API для загрузки изображений
 // ImgBB предоставляет бесплатный API ключ: можно получить на https://api.imgbb.com/
 
-const IMGBB_API_KEY = '5c1c3e6ef9b5c5b4a5e3c5b4a5e3c5b4'; // Бесплатный публичный ключ для демо
+const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
 export const uploadImageToImgBB = async (file: File): Promise<string> => {
+  // Проверяем наличие API ключа
+  if (!IMGBB_API_KEY || IMGBB_API_KEY === 'your_imgbb_api_key_here') {
+    throw new Error('ImgBB API ключ не настроен. Получите ключ на https://api.imgbb.com/');
+  }
+
+  // Валидируем файл
+  const validation = validateImageFile(file);
+  if (!validation.valid) {
+    throw new Error(validation.error);
+  }
+
   try {
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('key', IMGBB_API_KEY);
 
-    const response = await fetch('https://api.imgbb.com/1/upload', {
+    const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
       method: 'POST',
       body: formData,
     });
 
     if (!response.ok) {
-      throw new Error('Ошибка загрузки изображения');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || 'Ошибка загрузки на ImgBB');
     }
 
     const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error?.message || 'Не удалось загрузить изображение');
+    }
+
     return data.data.url;
-  } catch (error) {
-    console.error('Upload error:', error);
-    throw new Error('Не удалось загрузить изображение');
+  } catch (error: any) {
+    console.error('ImgBB upload error:', error);
+    throw new Error(error.message || 'Не удалось загрузить изображение');
   }
 };
 
