@@ -1166,10 +1166,20 @@ function AdminGallery() {
 
   const handleSave = async (data: any) => {
     try {
+      // Sanitize payload to satisfy backend validators
+      const sanitized = {
+        title: (data.title ?? '').toString().trim(),
+        imageUrl: (data.imageUrl ?? '').toString().trim(),
+        category: (data.category ?? '').toString().trim(),
+        description: (data.description ?? '').toString().trim() || undefined,
+        order: Number.isFinite(Number(data.order)) ? Number(data.order) : 0,
+        featured: Boolean(data.featured),
+      } as const;
+
       if (editingItem) {
-        await galleryAPI.update(editingItem._id, data);
+        await galleryAPI.update(editingItem._id, sanitized);
       } else {
-        await galleryAPI.create(data);
+        await galleryAPI.create(sanitized);
       }
       setShowDialog(false);
       fetchGallery();
