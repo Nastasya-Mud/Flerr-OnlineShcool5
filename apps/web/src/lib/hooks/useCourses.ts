@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { coursesAPI } from '../api';
 
 export interface Course {
@@ -27,22 +27,60 @@ export const useCourses = (params?: any) => {
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<any>(null);
 
+  // Мемоизируем ключ зависимостей для избежания лишних запросов
+  const paramsKey = useMemo(() => JSON.stringify(params || {}), [JSON.stringify(params || {})]);
+
   useEffect(() => {
+    let cancelled = false;
+
     const fetchCourses = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        console.log('Fetching courses with params:', params);
         const response = await coursesAPI.getAll(params);
-        setCourses(response.data.courses);
-        setPagination(response.data.pagination);
+        console.log('Courses API response:', response.data);
+        
+        // Проверяем, что данные пришли корректно
+        if (cancelled) return;
+        
+        if (response.data) {
+          const coursesData = response.data.courses || [];
+          const paginationData = response.data.pagination || null;
+          
+          console.log(`Loaded ${coursesData.length} courses`);
+          
+          setCourses(coursesData);
+          setPagination(paginationData);
+        } else {
+          console.warn('No data in response');
+          setCourses([]);
+          setPagination(null);
+        }
       } catch (err: any) {
-        setError(err.response?.data?.error || 'Ошибка загрузки курсов');
+        if (cancelled) return;
+        
+        console.error('Error fetching courses:', err);
+        console.error('Error details:', err.response?.data);
+        
+        const errorMessage = err.response?.data?.error || err.message || 'Ошибка загрузки курсов';
+        setError(errorMessage);
+        setCourses([]);
+        setPagination(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCourses();
-  }, [JSON.stringify(params)]);
+    
+    return () => {
+      cancelled = true;
+    };
+  }, [paramsKey]);
 
   return { courses, loading, error, pagination };
 };

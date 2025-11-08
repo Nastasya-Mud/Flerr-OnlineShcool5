@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Filter } from 'lucide-react';
 import { CourseCard } from '@/components/domain/CourseCard';
 import { Button } from '@/components/ui/button';
@@ -15,17 +15,19 @@ export function CoursesPage() {
     sort: '-createdAt',
   });
 
-  const { courses, loading, pagination } = useCourses({ ...filters, published: true });
+  // Мемоизируем параметры запроса
+  const queryParams = useMemo(() => ({ ...filters, published: true }), [filters.level, filters.category, filters.sort]);
+  const { courses, loading, error, pagination } = useCourses(queryParams);
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters({ level: '', category: '', sort: '-createdAt' });
-  };
+  }, []);
 
-  const hasActiveFilters = filters.level || filters.category;
+  const hasActiveFilters = useMemo(() => filters.level || filters.category, [filters.level, filters.category]);
 
   return (
     <div className="py-12">
@@ -121,9 +123,19 @@ export function CoursesPage() {
         {/* Results */}
         <div className="mb-6">
           <p className="text-[#9C7750]">
-            {loading ? 'Загрузка...' : `Найдено курсов: ${pagination?.total || 0}`}
+            {loading ? 'Загрузка...' : `Найдено курсов: ${pagination?.total || courses.length || 0}`}
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-800">{error}</p>
+            <p className="text-sm text-red-600 mt-2">
+              Проверьте консоль браузера (F12) для подробностей
+            </p>
+          </div>
+        )}
 
         {/* Courses Grid */}
         {loading ? (
