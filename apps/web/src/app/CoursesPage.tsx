@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Filter } from 'lucide-react';
 import { CourseCard } from '@/components/domain/CourseCard';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,11 @@ export function CoursesPage() {
   // Мемоизируем параметры запроса
   const queryParams = useMemo(() => ({ ...filters, published: true }), [filters.level, filters.category, filters.sort]);
   const { courses, loading, error, pagination } = useCourses(queryParams);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('CoursesPage render:', { courses, loading, error, coursesCount: courses?.length });
+  }, [courses, loading, error]);
 
   const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -148,15 +153,23 @@ export function CoursesPage() {
               </div>
             ))}
           </div>
-        ) : courses.length === 0 ? (
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-red-600 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Обновить страницу</Button>
+          </div>
+        ) : !courses || courses.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-xl text-[#9C7750] mb-4">Курсы не найдены</p>
+            <p className="text-sm text-[#9C7750] mb-4">
+              {loading ? 'Загрузка...' : 'Попробуйте изменить фильтры или обновить страницу'}
+            </p>
             <Button onClick={clearFilters}>Сбросить фильтры</Button>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course, index) => (
-              <CourseCard key={course._id} course={course} delay={index * 0.05} />
+              <CourseCard key={course._id || index} course={course} delay={index * 0.05} />
             ))}
           </div>
         )}

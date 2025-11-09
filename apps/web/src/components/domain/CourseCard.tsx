@@ -70,7 +70,7 @@ export function CourseCard({ course, delay = 0 }: CourseCardProps) {
                     <span>{Math.round(course.duration / 60)} мин</span>
                   </div>
                 )}
-                {course.lessons && (
+                {course.lessons && Array.isArray(course.lessons) && course.lessons.length > 0 && (
                   <div className="flex items-center gap-1.5">
                     <BookOpen className="w-4 h-4" />
                     <span>{course.lessons.length} уроков</span>
