@@ -27,9 +27,6 @@ export const useCourses = (params?: any) => {
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<any>(null);
 
-  // Мемоизируем ключ зависимостей для избежания лишних запросов
-  const paramsKey = useMemo(() => JSON.stringify(params || {}), [JSON.stringify(params || {})]);
-
   useEffect(() => {
     let cancelled = false;
 
@@ -38,31 +35,47 @@ export const useCourses = (params?: any) => {
         setLoading(true);
         setError(null);
         
-        console.log('Fetching courses with params:', params);
+        console.log('🔄 Fetching courses with params:', params);
         const response = await coursesAPI.getAll(params);
-        console.log('Courses API response:', response.data);
+        console.log('✅ Courses API response:', response);
+        console.log('📦 Response data:', response.data);
         
         // Проверяем, что данные пришли корректно
-        if (cancelled) return;
+        if (cancelled) {
+          console.log('❌ Request cancelled');
+          return;
+        }
         
-        if (response.data) {
-          const coursesData = response.data.courses || [];
+        if (response?.data) {
+          const coursesData = Array.isArray(response.data.courses) ? response.data.courses : [];
           const paginationData = response.data.pagination || null;
           
-          console.log(`Loaded ${coursesData.length} courses`);
+          console.log(`✅ Loaded ${coursesData.length} courses:`, coursesData);
+          console.log('📊 Pagination:', paginationData);
           
-          setCourses(coursesData);
-          setPagination(paginationData);
+          if (coursesData.length > 0) {
+            setCourses(coursesData);
+            setPagination(paginationData);
+            console.log('✅ Courses state updated');
+          } else {
+            console.warn('⚠️ No courses in response data');
+            setCourses([]);
+            setPagination(null);
+          }
         } else {
-          console.warn('No data in response');
+          console.warn('⚠️ No data in response');
           setCourses([]);
           setPagination(null);
         }
       } catch (err: any) {
-        if (cancelled) return;
+        if (cancelled) {
+          console.log('❌ Request cancelled (error)');
+          return;
+        }
         
-        console.error('Error fetching courses:', err);
-        console.error('Error details:', err.response?.data);
+        console.error('❌ Error fetching courses:', err);
+        console.error('❌ Error response:', err.response);
+        console.error('❌ Error data:', err.response?.data);
         
         const errorMessage = err.response?.data?.error || err.message || 'Ошибка загрузки курсов';
         setError(errorMessage);
@@ -71,6 +84,7 @@ export const useCourses = (params?: any) => {
       } finally {
         if (!cancelled) {
           setLoading(false);
+          console.log('✅ Loading finished');
         }
       }
     };
@@ -80,7 +94,7 @@ export const useCourses = (params?: any) => {
     return () => {
       cancelled = true;
     };
-  }, [paramsKey]);
+  }, [params?.level, params?.category, params?.sort, params?.published, params?.search]);
 
   return { courses, loading, error, pagination };
 };

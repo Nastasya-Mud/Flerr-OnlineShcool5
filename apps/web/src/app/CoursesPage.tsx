@@ -21,8 +21,14 @@ export function CoursesPage() {
 
   // Debug logging
   useEffect(() => {
-    console.log('CoursesPage render:', { courses, loading, error, coursesCount: courses?.length });
-  }, [courses, loading, error]);
+    console.log('🎨 CoursesPage render:', { 
+      courses: courses?.length || 0, 
+      loading, 
+      error,
+      coursesArray: courses,
+      pagination 
+    });
+  }, [courses, loading, error, pagination]);
 
   const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -128,8 +134,20 @@ export function CoursesPage() {
         {/* Results */}
         <div className="mb-6">
           <p className="text-[#9C7750]">
-            {loading ? 'Загрузка...' : `Найдено курсов: ${pagination?.total || courses.length || 0}`}
+            {loading ? (
+              'Загрузка...'
+            ) : error ? (
+              `Ошибка: ${error}`
+            ) : (
+              `Найдено курсов: ${pagination?.total ?? courses?.length ?? 0}`
+            )}
           </p>
+          {/* Debug info - можно удалить после исправления */}
+          {process.env.NODE_ENV === 'development' && (
+            <p className="text-xs text-gray-400 mt-1">
+              Debug: loading={String(loading)}, error={String(error)}, courses={courses?.length ?? 0}
+            </p>
+          )}
         </div>
 
         {/* Error Message */}
@@ -158,19 +176,25 @@ export function CoursesPage() {
             <p className="text-xl text-red-600 mb-4">{error}</p>
             <Button onClick={() => window.location.reload()}>Обновить страницу</Button>
           </div>
-        ) : !courses || courses.length === 0 ? (
+        ) : Array.isArray(courses) && courses.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course, index) => {
+              if (!course || !course._id) {
+                console.warn('⚠️ Invalid course at index', index, course);
+                return null;
+              }
+              return (
+                <CourseCard key={course._id} course={course} delay={index * 0.05} />
+              );
+            })}
+          </div>
+        ) : (
           <div className="text-center py-20">
             <p className="text-xl text-[#9C7750] mb-4">Курсы не найдены</p>
             <p className="text-sm text-[#9C7750] mb-4">
               {loading ? 'Загрузка...' : 'Попробуйте изменить фильтры или обновить страницу'}
             </p>
             <Button onClick={clearFilters}>Сбросить фильтры</Button>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course, index) => (
-              <CourseCard key={course._id || index} course={course} delay={index * 0.05} />
-            ))}
           </div>
         )}
       </div>
