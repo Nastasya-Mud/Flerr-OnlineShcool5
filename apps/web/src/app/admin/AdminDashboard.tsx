@@ -205,6 +205,20 @@ function CourseDialog({ course, onClose, onSave }: { course: any; onClose: () =>
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.coverUrl) {
+      if (!confirm('Вы не указали обложку курса. Сохранить без изображения?')) {
+        return;
+      }
+    }
+
+    if (formData.coverUrl && formData.coverUrl.includes('https://ibb.co/')) {
+      alert(
+        'Пожалуйста, используйте прямую ссылку из ImgBB (i.ibb.co/...). Откройте изображение, выберите "Direct link" и вставьте его.'
+      );
+      return;
+    }
+
     const preparedSlug = slugify(formData.slug || formData.title);
     const data = {
       ...formData,

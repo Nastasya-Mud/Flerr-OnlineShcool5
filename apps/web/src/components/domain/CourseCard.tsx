@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Users, Star, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -13,8 +13,13 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, delay = 0 }: CourseCardProps) {
-  const FALLBACK_IMAGE =
-    'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=80';
+  const FALLBACK_IMAGE = useMemo(
+    () =>
+      `data:image/svg+xml;utf8,${encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#F4E7D3"/><stop offset="100%" stop-color="#E5D4B0"/></linearGradient></defs><rect width="600" height="400" fill="url(#g)" rx="24"/><g fill="#A50C0A" font-family="'Segoe UI',sans-serif" text-anchor="middle"><text x="50%" y="52%" font-size="44" font-weight="700">Flerr Course</text><text x="50%" y="68%" font-size="20" fill="#9C7750">Изображение недоступно</text></g></svg>`
+      )}`,
+    []
+  );
 
   const [imageSrc, setImageSrc] = useState(course.coverUrl || FALLBACK_IMAGE);
 
