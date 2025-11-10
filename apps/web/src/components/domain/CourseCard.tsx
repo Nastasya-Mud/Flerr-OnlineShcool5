@@ -21,10 +21,31 @@ export function CourseCard({ course, delay = 0 }: CourseCardProps) {
     []
   );
 
-  const [imageSrc, setImageSrc] = useState(course.coverUrl || FALLBACK_IMAGE);
+  const optimizeImageUrl = (url?: string | null) => {
+    if (!url) return FALLBACK_IMAGE;
+    try {
+      const u = new URL(url);
+      // If link is a page link from ImgBB, keep as is (fallback сработает при ошибке)
+      // Optimize Unsplash originals to faster variants
+      if (u.hostname === 'images.unsplash.com') {
+        // Ensure reasonable params
+        const params = u.searchParams;
+        if (!params.has('w')) params.set('w', '900');
+        if (!params.has('q')) params.set('q', '80');
+        if (!params.has('auto')) params.set('auto', 'format');
+        if (!params.has('fit')) params.set('fit', 'crop');
+        u.search = params.toString();
+      }
+      return u.toString();
+    } catch {
+      return FALLBACK_IMAGE;
+    }
+  };
+
+  const [imageSrc, setImageSrc] = useState(optimizeImageUrl(course.coverUrl));
 
   useEffect(() => {
-    setImageSrc(course.coverUrl || FALLBACK_IMAGE);
+    setImageSrc(optimizeImageUrl(course.coverUrl));
   }, [course.coverUrl]);
 
   const handleImageError = () => {
@@ -51,6 +72,9 @@ export function CourseCard({ course, delay = 0 }: CourseCardProps) {
               alt={course.title}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-[#f5f1eb]"
               loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
               onError={handleImageError}
             />
             <div className="absolute top-3 right-3">
