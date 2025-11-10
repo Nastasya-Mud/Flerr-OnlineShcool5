@@ -7,6 +7,7 @@ import { TeachersSection } from '@/components/domain/TeachersSection';
 import { GallerySection } from '@/components/domain/GallerySection';
 import { useCourses } from '@/lib/hooks/useCourses';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 export function HomePage() {
   const { courses, loading } = useCourses({ limit: 6, published: true });
@@ -50,9 +51,11 @@ export function HomePage() {
             >
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1487530811176-3780de880c2d"
+                  src={getOptimizedImageUrl('https://images.unsplash.com/photo-1487530811176-3780de880c2d')}
                   alt="Флористика"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover bg-[#f5f1eb]"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl">

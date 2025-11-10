@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { galleryAPI } from '@/lib/api';
+import { FALLBACK_IMAGE_DATA_URI, getOptimizedImageUrl } from '@/lib/image';
 
 const CATEGORIES = [
   { value: '', label: 'Все работы' },
@@ -18,6 +19,7 @@ export function GalleryPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchGallery();
@@ -89,9 +91,19 @@ export function GalleryPage() {
                 className="group relative aspect-square overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300"
               >
                 <img
-                  src={item.imageUrl}
+                  src={failedImages[item._id] ? FALLBACK_IMAGE_DATA_URI : getOptimizedImageUrl(item.imageUrl)}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                  onError={() =>
+                    setFailedImages((prev) => ({
+                      ...prev,
+                      [item._id]: true,
+                    }))
+                  }
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-0 left-0 right-0 p-4">

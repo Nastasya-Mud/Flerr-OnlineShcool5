@@ -3,10 +3,12 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { teachersAPI } from '@/lib/api';
+import { FALLBACK_IMAGE_DATA_URI, getOptimizedImageUrl } from '@/lib/image';
 
 export function TeachersSection() {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -74,9 +76,19 @@ export function TeachersSection() {
               <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src={teacher.photo}
+                    src={failedImages[teacher._id] ? FALLBACK_IMAGE_DATA_URI : getOptimizedImageUrl(teacher.photo)}
                     alt={teacher.name}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
+                    onError={() =>
+                      setFailedImages((prev) => ({
+                        ...prev,
+                        [teacher._id]: true,
+                      }))
+                    }
                   />
                 </div>
                 <CardContent className="p-6">

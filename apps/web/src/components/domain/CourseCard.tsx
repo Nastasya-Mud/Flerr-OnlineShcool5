@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Users, Star, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LEVELS } from '@/lib/constants';
 import type { Course } from '@/lib/hooks/useCourses';
+import { FALLBACK_IMAGE_DATA_URI, getOptimizedImageUrl } from '@/lib/image';
 
 interface CourseCardProps {
   course: Course;
@@ -13,48 +14,19 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, delay = 0 }: CourseCardProps) {
-  const FALLBACK_IMAGE = useMemo(
-    () =>
-      `data:image/svg+xml;utf8,${encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><defs><linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#F4E7D3"/><stop offset="100%" stop-color="#E5D4B0"/></linearGradient></defs><rect width="600" height="400" fill="url(#g)" rx="24"/><g fill="#A50C0A" font-family="'Segoe UI',sans-serif" text-anchor="middle"><text x="50%" y="52%" font-size="44" font-weight="700">Flerr Course</text><text x="50%" y="68%" font-size="20" fill="#9C7750">Изображение недоступно</text></g></svg>`
-      )}`,
-    []
-  );
-
-  const optimizeImageUrl = (url?: string | null) => {
-    if (!url) return FALLBACK_IMAGE;
-    try {
-      const u = new URL(url);
-      // If link is a page link from ImgBB, keep as is (fallback сработает при ошибке)
-      // Optimize Unsplash originals to faster variants
-      if (u.hostname === 'images.unsplash.com') {
-        // Ensure reasonable params
-        const params = u.searchParams;
-        if (!params.has('w')) params.set('w', '900');
-        if (!params.has('q')) params.set('q', '80');
-        if (!params.has('auto')) params.set('auto', 'format');
-        if (!params.has('fit')) params.set('fit', 'crop');
-        u.search = params.toString();
-      }
-      return u.toString();
-    } catch {
-      return FALLBACK_IMAGE;
-    }
-  };
-
-  const [imageSrc, setImageSrc] = useState(optimizeImageUrl(course.coverUrl));
+  const [imageSrc, setImageSrc] = useState(getOptimizedImageUrl(course.coverUrl));
 
   useEffect(() => {
-    setImageSrc(optimizeImageUrl(course.coverUrl));
+    setImageSrc(getOptimizedImageUrl(course.coverUrl));
   }, [course.coverUrl]);
 
   const handleImageError = () => {
-    if (imageSrc !== FALLBACK_IMAGE) {
+    if (imageSrc !== FALLBACK_IMAGE_DATA_URI) {
       console.warn('⛔ Ошибка загрузки обложки курса, используется изображение по умолчанию', {
         courseId: course._id,
         original: course.coverUrl,
       });
-      setImageSrc(FALLBACK_IMAGE);
+      setImageSrc(FALLBACK_IMAGE_DATA_URI);
     }
   };
 
