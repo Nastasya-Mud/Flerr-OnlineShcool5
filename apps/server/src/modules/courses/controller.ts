@@ -2,6 +2,52 @@ import { Response } from 'express';
 import { Course, Lesson, User } from '../../db/models/index.js';
 import { AuthRequest } from '../../middlewares/auth.js';
 
+const transliterationMap: Record<string, string> = {
+  а: 'a',
+  б: 'b',
+  в: 'v',
+  г: 'g',
+  д: 'd',
+  е: 'e',
+  ё: 'e',
+  ж: 'zh',
+  з: 'z',
+  и: 'i',
+  й: 'y',
+  к: 'k',
+  л: 'l',
+  м: 'm',
+  н: 'n',
+  о: 'o',
+  п: 'p',
+  р: 'r',
+  с: 's',
+  т: 't',
+  у: 'u',
+  ф: 'f',
+  х: 'h',
+  ц: 'ts',
+  ч: 'ch',
+  ш: 'sh',
+  щ: 'sch',
+  ь: '',
+  ы: 'y',
+  ъ: '',
+  э: 'e',
+  ю: 'yu',
+  я: 'ya',
+};
+
+const generateSlug = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .split('')
+    .map((char) => transliterationMap[char as keyof typeof transliterationMap] ?? char)
+    .join('')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'kurs';
+
 export const getCourses = async (req: AuthRequest, res: Response) => {
   try {
     const {
@@ -105,12 +151,31 @@ export const getCourseBySlug = async (req: AuthRequest, res: Response) => {
 
 export const createCourse = async (req: AuthRequest, res: Response) => {
   try {
+    if (req.body.title && !req.body.slug) {
+      req.body.slug = generateSlug(req.body.title);
+    }
+
+    if (req.body.slug) {
+      req.body.slug = generateSlug(req.body.slug);
+    }
+
+    if (Array.isArray(req.body.categories)) {
+      req.body.categories = req.body.categories.map((item: string) => item.trim()).filter(Boolean);
+    }
+
     const course = await Course.create(req.body);
     res.status(201).json(course);
   } catch (error: any) {
     console.error('Create course error:', error);
     if (error.code === 11000) {
       return res.status(400).json({ error: 'Курс с таким slug уже существует' });
+    }
+    if (error.name === 'ValidationError') {
+      const details = Object.values(error.errors || {}).map((err: any) => err.message);
+      return res.status(400).json({
+        error: 'Ошибка валидации курса',
+        details,
+      });
     }
     res.status(500).json({ error: 'Ошибка создания курса' });
   }
@@ -119,6 +184,14 @@ export const createCourse = async (req: AuthRequest, res: Response) => {
 export const updateCourse = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
+
+    if (req.body.slug) {
+      req.body.slug = generateSlug(req.body.slug);
+    }
+
+    if (Array.isArray(req.body.categories)) {
+      req.body.categories = req.body.categories.map((item: string) => item.trim()).filter(Boolean);
+    }
 
     const course = await Course.findByIdAndUpdate(id, req.body, {
       new: true,

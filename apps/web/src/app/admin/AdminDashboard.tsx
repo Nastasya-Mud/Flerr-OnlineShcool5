@@ -140,6 +140,55 @@ function AdminHome() {
 }
 
 function CourseDialog({ course, onClose, onSave }: { course: any; onClose: () => void; onSave: (data: any) => void }) {
+  const transliterationMap: Record<string, string> = {
+    а: 'a',
+    б: 'b',
+    в: 'v',
+    г: 'g',
+    д: 'd',
+    е: 'e',
+    ё: 'e',
+    ж: 'zh',
+    з: 'z',
+    и: 'i',
+    й: 'y',
+    к: 'k',
+    л: 'l',
+    м: 'm',
+    н: 'n',
+    о: 'o',
+    п: 'p',
+    р: 'r',
+    с: 's',
+    т: 't',
+    у: 'u',
+    ф: 'f',
+    х: 'h',
+    ц: 'ts',
+    ч: 'ch',
+    ш: 'sh',
+    щ: 'sch',
+    ь: '',
+    ы: 'y',
+    ъ: '',
+    э: 'e',
+    ю: 'yu',
+    я: 'ya',
+  };
+
+  const slugify = (text: string) => {
+    const normalized = text
+      .trim()
+      .toLowerCase()
+      .split('')
+      .map((char) => transliterationMap[char as keyof typeof transliterationMap] ?? char)
+      .join('')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    return normalized || 'kurs';
+  };
+
   const [formData, setFormData] = useState({
     title: course?.title || '',
     slug: course?.slug || '',
@@ -150,20 +199,60 @@ function CourseDialog({ course, onClose, onSave }: { course: any; onClose: () =>
     coverUrl: course?.coverUrl || '',
     instructor: course?.instructor || '',
     duration: course?.duration || 0,
-    published: course?.published || false,
+    published: course?.published ?? true,
   });
+  const [slugTouched, setSlugTouched] = useState<boolean>(Boolean(course?.slug));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const preparedSlug = slugify(formData.slug || formData.title);
     const data = {
       ...formData,
-      categories: formData.categories.split(',').map((c: string) => c.trim()).filter(Boolean),
+      title: formData.title.trim(),
+      slug: preparedSlug,
+      shortDescription: formData.shortDescription.trim(),
+      description: formData.description.trim(),
+      instructor: formData.instructor.trim(),
+      coverUrl: formData.coverUrl.trim(),
+      duration: Number.isFinite(Number(formData.duration)) ? Number(formData.duration) : 0,
+      categories: formData.categories
+        .split(',')
+        .map((c: string) => c.trim())
+        .filter(Boolean),
     };
     onSave(data);
   };
 
   const handleChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === 'slug') {
+      setSlugTouched(true);
+    }
+
+    setFormData((prev) => {
+      const next = { ...prev };
+
+      switch (field) {
+        case 'title': {
+          next.title = value;
+          if (!slugTouched) {
+            next.slug = slugify(value);
+          }
+          break;
+        }
+        case 'slug': {
+          next.slug = slugify(value);
+          break;
+        }
+        case 'duration': {
+          next.duration = Number.isFinite(Number(value)) ? Number(value) : 0;
+          break;
+        }
+        default:
+          next[field as keyof typeof next] = value;
+      }
+
+      return next;
+    });
   };
 
   return (
@@ -193,9 +282,12 @@ function CourseDialog({ course, onClose, onSave }: { course: any; onClose: () =>
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => handleChange('slug', e.target.value)}
-                placeholder="osnovyi-floristiki"
+                placeholder="osnovy-floristiki"
                 required
               />
+              <p className="text-xs text-[#9C7750] mt-1">
+                Ссылка формируется автоматически, но вы можете её изменить. Используйте латиницу, цифры и дефисы.
+              </p>
             </div>
           </div>
 
@@ -237,7 +329,8 @@ function CourseDialog({ course, onClose, onSave }: { course: any; onClose: () =>
                 id="duration"
                 type="number"
                 value={formData.duration}
-                onChange={(e) => handleChange('duration', parseInt(e.target.value))}
+                onChange={(e) => handleChange('duration', e.target.value)}
+                min={0}
                 required
               />
             </div>
@@ -367,7 +460,12 @@ function AdminCourses() {
       fetchCourses();
     } catch (error) {
       console.error('Error saving course:', error);
-      alert('Ошибка при сохранении курса');
+      const message =
+        (error as any)?.response?.data?.error ||
+        (error as any)?.response?.data?.message ||
+        (error as Error).message ||
+        'Ошибка при сохранении курса';
+      alert(message);
     }
   };
 

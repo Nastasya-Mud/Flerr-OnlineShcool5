@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Users, Star, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -12,6 +13,25 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, delay = 0 }: CourseCardProps) {
+  const FALLBACK_IMAGE =
+    'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=80';
+
+  const [imageSrc, setImageSrc] = useState(course.coverUrl || FALLBACK_IMAGE);
+
+  useEffect(() => {
+    setImageSrc(course.coverUrl || FALLBACK_IMAGE);
+  }, [course.coverUrl]);
+
+  const handleImageError = () => {
+    if (imageSrc !== FALLBACK_IMAGE) {
+      console.warn('⛔ Ошибка загрузки обложки курса, используется изображение по умолчанию', {
+        courseId: course._id,
+        original: course.coverUrl,
+      });
+      setImageSrc(FALLBACK_IMAGE);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,9 +42,11 @@ export function CourseCard({ course, delay = 0 }: CourseCardProps) {
         <Card className="group hover:scale-[1.02] transition-transform duration-300 cursor-pointer overflow-hidden">
           <div className="relative aspect-[4/5] overflow-hidden">
             <img
-              src={course.coverUrl}
+              src={imageSrc}
               alt={course.title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 bg-[#f5f1eb]"
+              loading="lazy"
+              onError={handleImageError}
             />
             <div className="absolute top-3 right-3">
               <Badge variant="default">{LEVELS[course.level]}</Badge>
