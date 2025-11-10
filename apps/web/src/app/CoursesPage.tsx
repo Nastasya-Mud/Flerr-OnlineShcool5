@@ -66,12 +66,12 @@ export function CoursesPage() {
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium text-[#333A1A] mb-2 block">Уровень</label>
-              <Select value={filters.level} onValueChange={(value) => handleFilterChange('level', value)}>
+              <Select value={filters.level || 'all'} onValueChange={(value) => handleFilterChange('level', value === 'all' ? '' : value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Все уровни" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Все уровни</SelectItem>
+                  <SelectItem value="all">Все уровни</SelectItem>
                   {Object.entries(LEVELS).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
@@ -83,12 +83,12 @@ export function CoursesPage() {
 
             <div>
               <label className="text-sm font-medium text-[#333A1A] mb-2 block">Категория</label>
-              <Select value={filters.category} onValueChange={(value) => handleFilterChange('category', value)}>
+              <Select value={filters.category || 'all'} onValueChange={(value) => handleFilterChange('category', value === 'all' ? '' : value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Все категории" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Все категории</SelectItem>
+                  <SelectItem value="all">Все категории</SelectItem>
                   {CATEGORIES.map((cat) => (
                     <SelectItem key={cat.value} value={cat.value}>
                       {cat.label}
