@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -8,19 +7,9 @@ import { TeachersSection } from '@/components/domain/TeachersSection';
 import { GallerySection } from '@/components/domain/GallerySection';
 import { useCourses } from '@/lib/hooks/useCourses';
 import { Skeleton } from '@/components/ui/skeleton';
-import { FALLBACK_IMAGE_DATA_URI, getOptimizedImageUrl } from '@/lib/image';
 
 export function HomePage() {
   const { courses, loading } = useCourses({ limit: 6, published: true });
-  const heroImageUrl = useMemo(
-    () => getOptimizedImageUrl('https://images.unsplash.com/photo-1487530811176-3780de880c2d'),
-    []
-  );
-  const [heroSrc, setHeroSrc] = useState(heroImageUrl);
-
-  useEffect(() => {
-    setHeroSrc(heroImageUrl);
-  }, [heroImageUrl]);
 
   return (
     <div>
@@ -61,14 +50,9 @@ export function HomePage() {
             >
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl bg-[#f5f1eb]">
                 <img
-                  src={heroSrc}
+                  src="/images/hero.jpg"
                   alt="Флористика"
                   className="w-full h-full object-cover"
-                  loading="eager"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                  crossOrigin="anonymous"
-                  onError={() => setHeroSrc(FALLBACK_IMAGE_DATA_URI)}
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl">
