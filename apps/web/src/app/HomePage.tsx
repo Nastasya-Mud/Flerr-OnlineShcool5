@@ -50,9 +50,11 @@ export function HomePage() {
             >
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl bg-[#f5f1eb]">
                 <img
-                  src="/images/hero.jpg"
+                  src="/images/hero.svg"
                   alt="Флористика"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl">
