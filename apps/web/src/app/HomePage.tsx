@@ -8,10 +8,14 @@ import { TeachersSection } from '@/components/domain/TeachersSection';
 import { GallerySection } from '@/components/domain/GallerySection';
 import { useCourses } from '@/lib/hooks/useCourses';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 export function HomePage() {
   const { courses, loading } = useCourses({ limit: 6, published: true });
-  const [heroSrc, setHeroSrc] = useState('/images/hero.jpg');
+  const HERO_IMAGE = getOptimizedImageUrl(
+    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&q=80'
+  );
+  const [heroSrc, setHeroSrc] = useState(HERO_IMAGE);
 
   return (
     <div>
@@ -57,7 +61,7 @@ export function HomePage() {
                   className="w-full h-full object-cover"
                   loading="lazy"
                   decoding="async"
-                  onError={() => setHeroSrc('/images/hero.svg')}
+                  onError={() => setHeroSrc('/images/hero-fallback.svg')}
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl">
