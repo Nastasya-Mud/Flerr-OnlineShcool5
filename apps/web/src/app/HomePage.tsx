@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -10,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function HomePage() {
   const { courses, loading } = useCourses({ limit: 6, published: true });
+  const [heroSrc, setHeroSrc] = useState('/images/hero.jpg');
 
   return (
     <div>
@@ -50,11 +52,12 @@ export function HomePage() {
             >
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl bg-[#f5f1eb]">
                 <img
-                  src="/images/hero.svg"
+                  src={heroSrc}
                   alt="Флористика"
                   className="w-full h-full object-cover"
                   loading="lazy"
                   decoding="async"
+                  onError={() => setHeroSrc('/images/hero.svg')}
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl">
