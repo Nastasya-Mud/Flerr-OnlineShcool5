@@ -12,17 +12,15 @@ import { getOptimizedImageUrl } from '@/lib/image';
 
 export function HomePage() {
   const { courses, loading } = useCourses({ limit: 6, published: true });
-  const HERO_IMAGE = getOptimizedImageUrl(
-    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&q=80'
-  );
-  const [heroSrc, setHeroSrc] = useState(HERO_IMAGE);
+  const HERO_IMAGE = getOptimizedImageUrl('/images/hero.jpg');
+  const [heroSrc, setHeroSrc] = useState<string>(HERO_IMAGE);
 
   return (
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-[minmax(0,1fr)_520px] gap-10 lg:gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -49,19 +47,20 @@ export function HomePage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative"
+              initial={{ opacity: 0, x: 60, scale: 0.92 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="relative flex justify-center md:justify-end"
             >
-              <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl bg-[#f5f1eb]">
+              <div className="w-[340px] md:w-[480px] lg:w-[560px] aspect-[3/4] rounded-[36px] overflow-hidden shadow-[0_25px_50px_rgba(165,12,10,0.25)] bg-[#f5f1eb]">
                 <img
                   src={heroSrc}
                   alt="Флористика"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
                   loading="lazy"
                   decoding="async"
-                  onError={() => setHeroSrc('/images/hero-fallback.svg')}
+                  onError={() => setHeroSrc(getOptimizedImageUrl('/images/hero-fallback.svg'))}
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl">
