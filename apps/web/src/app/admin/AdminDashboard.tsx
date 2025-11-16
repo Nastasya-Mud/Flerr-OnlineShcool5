@@ -1343,7 +1343,6 @@ function AdminGallery() {
 }
 
 function AdminSiteSettings() {
-  const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -1356,7 +1355,6 @@ function AdminSiteSettings() {
       try {
         const response = await siteSettingsAPI.get();
         const data = response.data.settings;
-        setSettings(data);
         setFormData({
           heroImage1: data.heroImage1 || '',
           heroImage2: data.heroImage2 || '',
@@ -1374,8 +1372,7 @@ function AdminSiteSettings() {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const response = await siteSettingsAPI.update(formData);
-      setSettings(response.data.settings);
+      await siteSettingsAPI.update(formData);
       alert('Настройки успешно сохранены!');
     } catch (error: any) {
       console.error('Error saving settings:', error);
