@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Ticket, Users, Settings, GraduationCap, ImageIcon } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Ticket, Users, Settings, GraduationCap, ImageIcon, Monitor } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ImageUpload } from '@/components/ui/image-upload';
-import { adminAPI, coursesAPI, promoAPI, teachersAPI, galleryAPI } from '@/lib/api';
+import { adminAPI, coursesAPI, promoAPI, teachersAPI, galleryAPI, siteSettingsAPI } from '@/lib/api';
 import { LEVELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
@@ -1342,6 +1342,138 @@ function AdminGallery() {
   );
 }
 
+function AdminSiteSettings() {
+  const [settings, setSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    heroImage1: '',
+    heroImage2: '',
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await siteSettingsAPI.get();
+        const data = response.data.settings;
+        setSettings(data);
+        setFormData({
+          heroImage1: data.heroImage1 || '',
+          heroImage2: data.heroImage2 || '',
+        });
+      } catch (error) {
+        console.error('Error fetching site settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const response = await siteSettingsAPI.update(formData);
+      setSettings(response.data.settings);
+      alert('Настройки успешно сохранены!');
+    } catch (error: any) {
+      console.error('Error saving settings:', error);
+      alert('Ошибка при сохранении: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold text-[#333A1A] mb-2">Настройки сайта</h2>
+        <p className="text-[#9C7750]">Управление изображениями главной страницы</p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Изображения главной страницы</CardTitle>
+          <CardDescription>Загрузите или вставьте URL изображений для hero-блока</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <Label htmlFor="heroImage1">Первое изображение (обязательно) *</Label>
+            <ImageUpload
+              value={formData.heroImage1}
+              onChange={(url) => setFormData((prev) => ({ ...prev, heroImage1: url }))}
+              label="Загрузить первое изображение"
+            />
+            <Input
+              id="heroImage1"
+              value={formData.heroImage1}
+              onChange={(e) => setFormData((prev) => ({ ...prev, heroImage1: e.target.value }))}
+              placeholder="https://images.unsplash.com/..."
+              className="mt-2"
+            />
+            {formData.heroImage1 && (
+              <div className="mt-3 rounded-lg overflow-hidden border">
+                <img
+                  src={formData.heroImage1}
+                  alt="Preview 1"
+                  className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><rect width="600" height="400" fill="#f5f1eb"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#9C7750">Изображение недоступно</text></svg>';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="heroImage2">Второе изображение (опционально)</Label>
+            <ImageUpload
+              value={formData.heroImage2}
+              onChange={(url) => setFormData((prev) => ({ ...prev, heroImage2: url }))}
+              label="Загрузить второе изображение"
+            />
+            <Input
+              id="heroImage2"
+              value={formData.heroImage2}
+              onChange={(e) => setFormData((prev) => ({ ...prev, heroImage2: e.target.value }))}
+              placeholder="https://images.unsplash.com/..."
+              className="mt-2"
+            />
+            {formData.heroImage2 && (
+              <div className="mt-3 rounded-lg overflow-hidden border">
+                <img
+                  src={formData.heroImage2}
+                  alt="Preview 2"
+                  className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><rect width="600" height="400" fill="#f5f1eb"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#9C7750">Изображение недоступно</text></svg>';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button onClick={handleSave} disabled={saving || !formData.heroImage1} className="bg-[#A50C0A]">
+              {saving ? 'Сохранение...' : 'Сохранить настройки'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export function AdminDashboard() {
   const location = useLocation();
 
@@ -1350,6 +1482,7 @@ export function AdminDashboard() {
     { href: '/admin/courses', label: 'Курсы', icon: BookOpen, path: 'courses' },
     { href: '/admin/teachers', label: 'Преподаватели', icon: GraduationCap, path: 'teachers' },
     { href: '/admin/gallery', label: 'Галерея', icon: ImageIcon, path: 'gallery' },
+    { href: '/admin/site-settings', label: 'Настройки сайта', icon: Monitor, path: 'site-settings' },
     { href: '/admin/promo', label: 'Промокоды', icon: Ticket, path: 'promo' },
     { href: '/admin/users', label: 'Пользователи', icon: Users, path: 'users' },
   ];
@@ -1400,6 +1533,7 @@ export function AdminDashboard() {
               <Route path="courses" element={<AdminCourses />} />
               <Route path="teachers" element={<AdminTeachers />} />
               <Route path="gallery" element={<AdminGallery />} />
+              <Route path="site-settings" element={<AdminSiteSettings />} />
               <Route path="promo" element={<AdminPromoCodes />} />
               <Route path="users" element={<AdminUsers />} />
             </Routes>

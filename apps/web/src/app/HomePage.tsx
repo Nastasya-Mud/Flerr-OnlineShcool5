@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -9,11 +9,36 @@ import { GallerySection } from '@/components/domain/GallerySection';
 import { useCourses } from '@/lib/hooks/useCourses';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getOptimizedImageUrl } from '@/lib/image';
+import { siteSettingsAPI } from '@/lib/api';
 
 export function HomePage() {
   const { courses, loading } = useCourses({ limit: 6, published: true });
-  const HERO_IMAGE = getOptimizedImageUrl('/images/hero.jpg');
-  const [heroSrc, setHeroSrc] = useState<string>(HERO_IMAGE);
+  const [heroImage1, setHeroImage1] = useState<string>('');
+  const [heroImage2, setHeroImage2] = useState<string>('');
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await siteSettingsAPI.get();
+        const settings = response.data.settings;
+        if (settings.heroImage1) {
+          setHeroImage1(getOptimizedImageUrl(settings.heroImage1));
+        }
+        if (settings.heroImage2) {
+          setHeroImage2(getOptimizedImageUrl(settings.heroImage2));
+        }
+      } catch (error) {
+        console.error('Error fetching site settings:', error);
+        // Fallback to default image
+        setHeroImage1(getOptimizedImageUrl('https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1200&q=80&auto=format&fit=crop'));
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   return (
     <div>
@@ -49,20 +74,55 @@ export function HomePage() {
             <motion.div
               initial={{ opacity: 0, x: 60, scale: 0.92 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              whileHover={{ scale: 1.03 }}
               transition={{ duration: 0.7, delay: 0.15 }}
-              className="relative flex justify-center md:justify-end"
+              className="relative flex justify-center md:justify-end gap-4 flex-wrap"
             >
-              <div className="w-[340px] md:w-[480px] lg:w-[560px] aspect-[3/4] rounded-[36px] overflow-hidden shadow-[0_25px_50px_rgba(165,12,10,0.25)] bg-[#f5f1eb]">
-                <img
-                  src={heroSrc}
-                  alt="Флористика"
-                  className="w-full h-full object-cover object-center"
-                  loading="lazy"
-                  decoding="async"
-                  onError={() => setHeroSrc(getOptimizedImageUrl('/images/hero-fallback.svg'))}
-                />
-              </div>
+              {loadingSettings ? (
+                <Skeleton className="w-[400px] md:w-[500px] lg:w-[600px] aspect-[3/4] rounded-[36px]" />
+              ) : (
+                <>
+                  {heroImage1 && (
+                    <motion.div
+                      whileHover={{ scale: 1.05, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-[400px] md:w-[500px] lg:w-[600px] aspect-[3/4] rounded-[36px] overflow-hidden shadow-[0_25px_50px_rgba(165,12,10,0.25)] bg-[#f5f1eb]"
+                    >
+                      <img
+                        src={heroImage1}
+                        alt="Флористика"
+                        className="w-full h-full object-cover object-center"
+                        loading="eager"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = getOptimizedImageUrl('https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1200&q=80&auto=format&fit=crop');
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                  {heroImage2 && (
+                    <motion.div
+                      whileHover={{ scale: 1.05, y: -10 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      className="w-[400px] md:w-[500px] lg:w-[600px] aspect-[3/4] rounded-[36px] overflow-hidden shadow-[0_25px_50px_rgba(165,12,10,0.25)] bg-[#f5f1eb]"
+                    >
+                      <img
+                        src={heroImage2}
+                        alt="Флористика"
+                        className="w-full h-full object-cover object-center"
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = getOptimizedImageUrl('https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1200&q=80&auto=format&fit=crop');
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </>
+              )}
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-[#A50C0A] rounded-full flex items-center justify-center">

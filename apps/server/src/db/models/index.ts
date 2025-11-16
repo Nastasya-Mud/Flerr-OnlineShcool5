@@ -14,4 +14,6 @@ export { Teacher } from './Teacher.js';
 export type { ITeacher } from './Teacher.js';
 export { Gallery } from './Gallery.js';
 export type { IGallery } from './Gallery.js';
+export { SiteSettings } from './SiteSettings.js';
+export type { ISiteSettings } from './SiteSettings.js';
 

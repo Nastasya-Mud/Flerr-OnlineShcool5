@@ -18,12 +18,13 @@ export const connectDB = async () => {
 
 async function createIndexes() {
   try {
-    const { Course, Lesson, PromoCode, User } = await import('./models/index.js');
+    const { Course, Lesson, PromoCode, User, SiteSettings } = await import('./models/index.js');
     
     await Course.createIndexes();
     await Lesson.createIndexes();
     await PromoCode.createIndexes();
     await User.createIndexes();
+    await SiteSettings.createIndexes();
     
     console.log('✅ Database indexes created');
   } catch (error) {

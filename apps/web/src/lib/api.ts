@@ -130,3 +130,9 @@ export const galleryAPI = {
   delete: (id: string) => api.delete(`/gallery/${id}`),
 };
 
+// Site Settings API
+export const siteSettingsAPI = {
+  get: () => api.get('/site-settings'),
+  update: (data: { heroImage1?: string; heroImage2?: string }) => api.patch('/site-settings', data),
+};
+
